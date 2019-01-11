@@ -1,9 +1,14 @@
 package com.tanvir.tanvirmahmudkhan.myapplication;
 
+import android.content.Context;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.tanvir.tanvirmahmudkhan.model.Flower;
 import com.tanvir.tanvirmahmudkhan.parser.FlowerJSONParser;
@@ -13,25 +18,37 @@ import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
 
-    TextView tv1;
+    //TextView tv1;
     List<Flower> flowers;
+    ListView listView;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        tv1 = findViewById(R.id.tv1);
+        listView = findViewById(R.id.listView);
         //flowers = new ArrayList<>();
-        MyTask myTask = new MyTask();
 
-        myTask.execute("http://services.hanselandpetal.com/feeds/flowers.json");
+        String url = "http://services.hanselandpetal.com/feeds/flowers.json";
 
-
-
-
-
+        if(isOnline()){
+            MyTask myTask = new MyTask();
+            myTask.execute(url);
+        }
+        else {
+            Toast.makeText(MainActivity.this,"No internet connection...",Toast.LENGTH_LONG).show();
+        }
     }
 
+    private boolean isOnline() {
+        ConnectivityManager manager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo networkInfo = manager.getActiveNetworkInfo();
+        boolean isAvailable = false;
+        if (networkInfo != null && networkInfo.isConnectedOrConnecting()) {
+            isAvailable = true;
+        }
+        return isAvailable;
+    }
 
     private class MyTask extends AsyncTask<String,String,String>
     {
@@ -46,14 +63,8 @@ public class MainActivity extends AppCompatActivity {
             flowers= FlowerJSONParser.parseFeed(s);
 
             if(flowers != null){
-                for (int i=0; i<flowers.size(); i++) {
-                    String str = tv1.getText().toString();
-
-                    tv1.setText( str + "\n" + flowers.get(i).getName());
-                }
-            }
-            else{
-                tv1.setText("Joy Bangla");
+                FlowerAdapter flowerAdapter = new FlowerAdapter(MainActivity.this,android.R.layout.simple_list_item_1,flowers);
+                listView.setAdapter(flowerAdapter);
             }
 
 
