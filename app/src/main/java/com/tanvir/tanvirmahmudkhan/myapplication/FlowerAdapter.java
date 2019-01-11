@@ -7,6 +7,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.tanvir.tanvirmahmudkhan.model.Flower;
@@ -35,8 +36,10 @@ public class FlowerAdapter extends ArrayAdapter<Flower> {
         Flower flower = flowers.get(position);
         TextView textView = (TextView) view.findViewById(R.id.flowerName);
 
-        if(flower!=null){
+        ImageView imageView = view.findViewById(R.id.flowerImage);
 
+        if(flower!=null){
+            imageView.setImageBitmap(flower.getBitmap());
             textView.setText(flower.getName());
         }
 
